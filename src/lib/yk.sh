@@ -75,3 +75,14 @@ yk_ask_pin() {
   ui_password "PIV PIN"
   YK_PIN="$REPLY"
 }
+
+# yk_pick_all -> sets YK_SELECTED to every connected YubiKey (or just --serial); never prompts
+yk_pick_all() {
+  yk_list
+  if [[ -n "$(get_flag serial)" ]]; then
+    yk_has_serial "$(get_flag serial)" || die "YubiKey $(get_flag serial) not connected"
+    YK_SELECTED=("$(get_flag serial)")
+  else
+    YK_SELECTED=("${YK_SERIALS[@]}")
+  fi
+}

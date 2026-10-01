@@ -29,6 +29,8 @@ fi
 # --- wizard ----------------------------------------------------------------
 algorithm="$(get_flag algorithm)"
 valid_days="$(get_flag valid-days)"
+PIN_POLICY="$(get_flag pin-policy)"
+TOUCH_POLICY="$(get_flag touch-policy)"
 subjects=()
 for i in "${!SLOTS[@]}"; do subjects[i]=""; done
 
@@ -50,7 +52,7 @@ else
 fi
 
 # --- plan ------------------------------------------------------------------
-plan=("Device:    $device" "Algorithm: $algorithm" "Validity:  $valid_days days (~$((valid_days / 365)) years)" "")
+plan=("Device:    $device" "Algorithm: $algorithm" "Policies:  PIN $PIN_POLICY, touch $TOUCH_POLICY (new keys)" "Validity:  $valid_days days (~$((valid_days / 365)) years)" "")
 for i in "${!SLOTS[@]}"; do
   case "${SLOT_STATE[$i]}" in
     complete) plan+=("${SLOTS[$i]}  leave unchanged") ;;
@@ -59,6 +61,11 @@ for i in "${!SLOTS[@]}"; do
   esac
 done
 clack_note "Plan" "${plan[@]}"
+
+if [[ -n "$(get_flag dry-run)" ]]; then
+  clack_outro "Dry run: nothing was changed."
+  exit 0
+fi
 
 if [[ -z "$(get_flag yes)" ]]; then
   ui_confirm "Configure this YubiKey?" false || {

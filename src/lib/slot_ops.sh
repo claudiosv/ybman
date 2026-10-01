@@ -31,7 +31,8 @@ provision_slot() {
   local hash fp_orig fp_ver fp_cert
 
   if [[ "$state" == empty ]]; then
-    yk "$serial" piv keys generate --pin "$YK_PIN" --algorithm "$algorithm" "$slot" "$pub" || return 1
+    yk "$serial" piv keys generate --pin "$YK_PIN" --algorithm "$algorithm" \
+      --pin-policy "$PIN_POLICY" --touch-policy "$TOUCH_POLICY" "$slot" "$pub" || return 1
   else
     yk "$serial" piv keys export --pin "$YK_PIN" --verify "$slot" "$pub" || return 1
   fi
@@ -105,4 +106,20 @@ refresh_slot() {
     return 1
   }
   cert_summary "$cert_new" >"$dir/$slot-cert-new-info.txt"
+}
+
+# restore_slot SERIAL SLOT DIR
+# Re-imports DIR/SLOT-cert.pem if it belongs to the key currently in the slot.
+restore_slot() {
+  local serial=$1 slot=$2 dir=$3
+  local cur="$TMP_DIR/$slot-restore-cur.pem" bak="$TMP_DIR/$slot-restore-bak.pem"
+
+  yk "$serial" piv keys export "$slot" "$cur" || return 1
+  openssl x509 -in "$dir/$slot-cert.pem" -pubkey -noout >"$bak" || return 1
+  [[ "$(pubkey_fingerprint "$cur")" == "$(pubkey_fingerprint "$bak")" ]] || {
+    echo "the backup certificate does not belong to the key now in slot $slot" >&2
+    return 1
+  }
+  chuid_mark_dirty
+  yk "$serial" piv certificates import --pin "$YK_PIN" "$slot" "$dir/$slot-cert.pem" || return 1
 }

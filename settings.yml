@@ -1,0 +1,7 @@
+# Colors for the --help output (functions come from src/lib/colors.sh).
+usage_colors:
+  caption: bold
+  command: green_bold
+  arg: yellow
+  flag: cyan
+  environment_variable: magenta

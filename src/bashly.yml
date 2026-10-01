@@ -2,6 +2,15 @@ name: ybman.sh
 help: Manage YubiKey PIV slots (9a 9c 9d 9e) - backup, provision, refresh
 version: 0.1.0
 
+footer: |-
+  Slots: 9a PIV Authentication, 9c Digital Signature, 9d Key Management,
+  9e Card Authentication. Private keys are generated on the device and never
+  leave it.
+
+  Every run writes a snapshot (certs, public keys, CHUID) to
+  <backup-root>/<serial>-<timestamp>/ before it changes anything.
+  Find serials with: ykman list --serials
+
 environment_variables:
 - name: ybman_backup_root
   help: Default for --backup-root
@@ -10,25 +19,34 @@ environment_variables:
 commands:
 - name: backup
   alias: b
+  group: Inspect
   help: Snapshot PIV state (device info, certs, public keys) of connected YubiKeys
   dependencies: [ykman]
   flags:
   - &backup_root
     long: --backup-root
     arg: dir
-    help: Directory for backups
+    help: Directory for backups (default ./yubikey-piv-backups)
   - &serial
     long: --serial
     short: -s
     arg: serial
-    help: Operate on this YubiKey only (skips the device picker)
+    help: Operate on this YubiKey only, skipping the device picker (see `ykman list --serials`)
+  - &json
+    long: --json
+    help: Machine-readable output (never prompts; uses every connected YubiKey unless --serial)
   examples:
-  - ybman.sh backup
-  - ybman.sh backup --serial 37614918
+  - ybman.sh backup                        # pick from connected YubiKeys
+  - ybman.sh backup --serial 37614918      # one specific YubiKey
 
 - name: provision
   alias: p
-  help: Generate keys and self-signed certificates for empty PIV slots
+  group: Modify
+  help: |-
+    Generate keys and self-signed certificates for empty PIV slots
+
+    Empty slots get a new on-device key and certificate; key-only slots get a
+    certificate; populated slots are left alone. Existing keys are never replaced.
   dependencies: [ykman, openssl, cmp]
   flags:
   - *backup_root
@@ -43,19 +61,40 @@ commands:
     short: -d
     arg: days
     default: "3650"
-    help: Certificate validity in days
+    help: Certificate validity in days (3650 is about 10 years)
   - &yes
     long: --yes
     short: -y
-    help: Skip the confirmation prompt
+    help: Skip the wizard and confirmation prompt, using default subjects
+  - &dry_run
+    long: --dry-run
+    help: Show the plan and exit without changing the YubiKey
+  - long: --pin-policy
+    arg: policy
+    allowed: [default, never, once, always, match-once, match-always]
+    default: default
+    help: When a PIN is required to use newly generated keys
+  - long: --touch-policy
+    arg: policy
+    allowed: [default, never, always, cached]
+    default: default
+    help: Whether newly generated keys require a touch
   examples:
-  - ybman.sh provision
-  - ybman.sh provision -s 37614918 -a ECCP256 -d 1825
+  - ybman.sh provision                                  # interactive wizard
+  - ybman.sh provision -s 37614918 -a ECCP256 -d 1825   # P-256, 5-year certificates
+  - ybman.sh provision --yes                            # non-interactive, defaults
+  - ybman.sh provision --dry-run                        # plan only
+  - ybman.sh provision --pin-policy once --touch-policy cached
 
 - name: refresh
   alias: r
-  help: Renew self-signed PIV certificates, keeping the existing keys
-  dependencies: [ykman, openssl, ugrep]
+  group: Modify
+  help: |-
+    Renew self-signed PIV certificates, keeping the existing keys
+
+    Refuses CA-issued certificates and certificates with X.509 extensions.
+    Subject and signature hash of each old certificate are reused.
+  dependencies: [ykman, openssl, cmp]
   flags:
   - *backup_root
   - *serial
@@ -63,8 +102,149 @@ commands:
     short: -d
     arg: days
     default: "3650"
-    help: New certificate validity in days
+    help: New certificate validity in days (3650 is about 10 years)
+  - *yes
+  - *dry_run
+  - long: --expiring-within
+    arg: days
+    help: Only refresh certificates that expire within this many days (skips the PIN when none do)
+  examples:
+  - ybman.sh refresh                                    # interactive
+  - ybman.sh refresh --serial 37614918 --valid-days 3650 --yes   # non-interactive
+  - ybman.sh refresh --expiring-within 60 --yes         # only certificates close to expiry
+  - ybman.sh refresh --dry-run                          # preflight checks, no changes
+
+- name: status
+  alias: s
+  group: Inspect
+  help: Show PIN/PUK retries and each slot's key, subject and expiry
+  dependencies: [ykman, openssl]
+  flags:
+  - *serial
+  - *json
+  examples:
+  - ybman.sh status
+  - ybman.sh status --json | jq '.[].slots[] | select(.days_left < 60)'
+
+- name: verify
+  alias: v
+  group: Inspect
+  help: |-
+    Check that each certificate matches the key on the device
+
+    Also checks that the latest backup of each YubiKey parses. Exits non-zero on
+    any problem. --deep additionally proves each key works (asks for the PIN).
+  dependencies: [ykman, openssl]
+  flags:
+  - *backup_root
+  - *serial
+  - long: --deep
+    help: Also verify the private keys with the PIN
+  examples:
+  - ybman.sh verify
+  - ybman.sh verify --deep
+
+- name: doctor
+  group: Inspect
+  help: Check that ykman, openssl, the smart card service and a YubiKey are available
+  examples:
+  - ybman.sh doctor
+
+- name: export
+  alias: e
+  group: Export
+  help: |-
+    Print or save certificates and public keys
+
+    Use --type ssh to get authorized_keys lines (needs ssh-keygen).
+  dependencies: [ykman, openssl]
+  flags:
+  - *serial
+  - long: --slot
+    arg: slot
+    allowed: ["9a", "9c", "9d", "9e"]
+    help: Only this slot (default all populated slots)
+  - long: --type
+    short: -t
+    arg: type
+    allowed: [cert, pubkey, ssh]
+    default: cert
+    help: What to export
+  - long: --out
+    short: -o
+    arg: dir
+    help: Write one file per slot here instead of printing to stdout
+  examples:
+  - ybman.sh export --type ssh --slot 9a >> ~/.ssh/authorized_keys
+  - ybman.sh export --type cert --out ./certs
+
+- name: csr
+  group: Export
+  help: |-
+    Create a certificate signing request for a slot, for a CA to sign
+
+    The request is signed on the YubiKey (touch it if it blinks). Slot 9d
+    (key management) cannot sign, so use 9a, 9c or 9e.
+  dependencies: [ykman, openssl]
+  flags:
+  - *serial
+  - long: --slot
+    arg: slot
+    allowed: ["9a", "9c", "9d", "9e"]
+    default: "9a"
+    help: Slot whose key the request is for
+  - long: --subject
+    arg: subject
+    help: Subject of the request (default is prompted, prefilled from the slot)
+  - long: --out
+    short: -o
+    arg: file
+    help: Where to write the CSR (default ./<serial>-<slot>.csr)
+  examples:
+  - ybman.sh csr --slot 9a --subject CN=alice
+  - ybman.sh csr --slot 9c -o signing.csr
+
+- name: restore
+  group: Modify
+  help: |-
+    Put certificates from a backup back on the YubiKey
+
+    Only certificates whose public key matches the key now in the slot are
+    restored; keys are never touched. The current state is backed up first, so
+    this also undoes a refresh.
+  dependencies: [ykman, openssl, cmp]
+  args:
+  - name: backup_dir
+    help: Backup directory to restore from (default is to pick one)
+  flags:
+  - *backup_root
   - *yes
   examples:
-  - ybman.sh refresh
-  - ybman.sh refresh --serial 37614918 --valid-days 3650 --yes
+  - ybman.sh restore
+  - ybman.sh restore yubikey-piv-backups/37614918-20261001-120933
+
+- name: credentials
+  alias: c
+  group: Modify
+  help: |-
+    Change the PIN, PUK or management key
+
+    "all" is the first-time setup: a new PIN and PUK, and a random management
+    key stored on the YubiKey and protected by the PIN (which provision and
+    refresh then use).
+  dependencies: [ykman]
+  flags:
+  - *serial
+  - long: --change
+    arg: what
+    allowed: [all, pin, puk, management-key]
+    help: What to change (default is to ask)
+  examples:
+  - ybman.sh credentials
+  - ybman.sh credentials --change pin
+
+- name: completions
+  group: Other
+  help: Print a bash completion script (source <(ybman completions))
+  examples:
+  - source <(ybman.sh completions)

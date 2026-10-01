@@ -1,5 +1,10 @@
 # OpenSSL helpers for PIV public keys and certificates.
 
+# search ARGS... : ugrep when installed, else grep.
+search() {
+  if command -v ugrep >/dev/null 2>&1; then ugrep --color=never "$@"; else grep --color=never "$@"; fi
+}
+
 pubkey_fingerprint() {
   openssl pkey -pubin -in "$1" -outform DER 2>/dev/null |
     openssl dgst -sha256 |
@@ -21,7 +26,7 @@ hash_from_cert() {
   local algorithm
   algorithm="$(
     openssl x509 -in "$1" -noout -text |
-      ugrep --color=never -m1 'Signature Algorithm:' |
+      search -m1 'Signature Algorithm:' |
       sed -E 's/.*Signature Algorithm:[[:space:]]*//'
   )"
   case "$algorithm" in
@@ -41,7 +46,7 @@ x509_name() {
 }
 
 cert_has_extensions() {
-  openssl x509 -in "$1" -noout -text | ugrep -q --color=never 'X509v3 extensions:'
+  openssl x509 -in "$1" -noout -text | search -q 'X509v3 extensions:'
 }
 
 cert_summary() {

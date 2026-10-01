@@ -15,6 +15,17 @@ fix:
 harden:
     shellharden --replace {{srcs}}
 
+# Build from the local checkout and install it (no download). PREFIX defaults to ~/.local.
+install prefix=env("PREFIX", home_directory() / ".local"): build
+    install -d {{prefix}}/bin
+    install -m 755 ybman.sh {{prefix}}/bin/ybman
+    @echo "installed {{prefix}}/bin/ybman"
+
+# Build and register this checkout with basher (symlinks ./ybman.sh as `ybman`; no download).
+# If basher already has claudiosv/ybman installed: basher uninstall claudiosv/ybman
+link: build
+    basher link . claudiosv/ybman
+
 # Read-only checks (same as the pre-commit hooks).
 lint: build
     shfmt -d {{srcs}}

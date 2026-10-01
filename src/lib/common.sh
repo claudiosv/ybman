@@ -8,6 +8,8 @@ DEFAULT_SUBJECTS=("CN=MacOS login" "CN=Digital Signature" "CN=encryption" "CN=Ca
 CHUID_OBJECT="5fc102"
 
 YK_DEVICE=""
+PIN_POLICY="default"
+TOUCH_POLICY="default"
 YK_PIN=""
 TMP_DIR=""
 
@@ -16,7 +18,7 @@ TMP_DIR=""
 # ---------------------------------------------------------------------------
 
 session_init() {
-  TMP_DIR="$(mktemp -d)"
+  TMP_DIR="$(mktemp -d "${TMPDIR:-/tmp}/ybman.XXXXXX")"
   trap session_cleanup EXIT
 }
 
