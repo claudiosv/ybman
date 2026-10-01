@@ -1,0 +1,25 @@
+justfile
+  s_dfd7a9957aee3c::t_6e775847304ca7 11-12,14
+  s_dfd7a9957aee3c::t_cd15e953928709 13
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "267792e0f8c13948a89e312bc0ee7a84528ffb1f",
+  "prompts": {},
+  "humans": {
+    "h_f111268fb1cdbc": {
+      "author": "claudiosv <8250468+claudiosv@users.noreply.github.com>"
+    }
+  },
+  "sessions": {
+    "s_dfd7a9957aee3c": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "b72b7e5b-6f0d-4463-9be5-c44bc07412a0",
+        "model": "claude-sonnet-5-5"
+      },
+      "human_author": "claudiosv <8250468+claudiosv@users.noreply.github.com>"
+    }
+  }
+}
