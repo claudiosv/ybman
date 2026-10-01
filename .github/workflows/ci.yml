@@ -12,6 +12,8 @@ permissions:
 
 env:
   SHELLHARDEN_VERSION: 4.3.2
+  SHFMT_VERSION: 3.14.1
+  SHELLCHECK_VERSION: 0.11.0
 
 jobs:
   check:
@@ -26,8 +28,30 @@ jobs:
       - name: Install apt packages (cached)
         uses: awalsh128/cache-apt-pkgs-action@v1
         with:
-          packages: shellcheck shfmt bats fd-find ugrep
+          packages: bats fd-find ugrep
           version: 1
+
+      # Ubuntu's apt ships old shfmt/shellcheck whose output differs from current releases.
+      - name: Cache shfmt and shellcheck
+        id: lint-tools
+        uses: actions/cache@v6
+        with:
+          path: |
+            ~/.local/bin/shfmt
+            ~/.local/bin/shellcheck
+          key: lint-tools-${{ runner.os }}-shfmt-${{ env.SHFMT_VERSION }}-shellcheck-${{ env.SHELLCHECK_VERSION }}
+
+      - name: Install shfmt and shellcheck
+        if: steps.lint-tools.outputs.cache-hit != 'true'
+        run: |
+          mkdir -p ~/.local/bin
+          curl -fsSL -o ~/.local/bin/shfmt \
+            "https://github.com/mvdan/sh/releases/download/v${SHFMT_VERSION}/shfmt_v${SHFMT_VERSION}_linux_amd64"
+          chmod +x ~/.local/bin/shfmt
+          curl -fsSL "https://github.com/koalaman/shellcheck/releases/download/v${SHELLCHECK_VERSION}/shellcheck-v${SHELLCHECK_VERSION}.linux.x86_64.tar.xz" |
+            tar -xJ --strip-components=1 -C ~/.local/bin "shellcheck-v${SHELLCHECK_VERSION}/shellcheck"
+
+      - run: echo "$HOME/.local/bin" >> "$GITHUB_PATH"
 
       - run: sudo ln -sf "$(command -v fdfind)" /usr/local/bin/fd
 
