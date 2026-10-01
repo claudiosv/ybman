@@ -1,0 +1,21 @@
+.gitignore
+  s_c9163780a2e3e3::t_a7fe6410e61040 17
+package.sh
+  s_c9163780a2e3e3::t_8d0b9d6deb129c 1-14
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "cb08c6d7678cfe7d350ec321f7efee822284b9b9",
+  "prompts": {},
+  "sessions": {
+    "s_c9163780a2e3e3": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "61e35078-273c-4ee7-a0ce-f930551c2800",
+        "model": "claude-sonnet-5-5"
+      },
+      "human_author": "claudiosv <8250468+claudiosv@users.noreply.github.com>"
+    }
+  }
+}
