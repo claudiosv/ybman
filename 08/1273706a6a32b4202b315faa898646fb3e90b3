@@ -1,0 +1,19 @@
+src/lib/report.sh
+  s_dfd7a9957aee3c::t_340ad9c82a45c8 62,66,70
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "081273706a6a32b4202b315faa898646fb3e90b3",
+  "prompts": {},
+  "sessions": {
+    "s_dfd7a9957aee3c": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "b72b7e5b-6f0d-4463-9be5-c44bc07412a0",
+        "model": "claude-sonnet-5-5"
+      },
+      "human_author": "claudiosv <8250468+claudiosv@users.noreply.github.com>"
+    }
+  }
+}
