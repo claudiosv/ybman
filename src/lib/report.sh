@@ -59,15 +59,15 @@ verify_slot() {
 
   yk "$serial" piv keys info "$slot" >/dev/null 2>&1 && key=1
   yk "$serial" piv certificates export "$slot" "$cert" >/dev/null 2>&1 && has_cert=1
-  if ((! key && ! has_cert)); then
+  if ((key == 0 && has_cert == 0)); then
     echo "empty"
     return 0
   fi
-  if ((! key)); then
+  if ((key == 0)); then
     echo "certificate without a detectable key"
     return 1
   fi
-  if ((! has_cert)); then
+  if ((has_cert == 0)); then
     echo "key without certificate"
     return 0
   fi
