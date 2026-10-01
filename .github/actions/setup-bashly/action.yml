@@ -1,0 +1,19 @@
+name: setup-bashly
+description: Install bashly from RubyGems, with the gem dir cached (refreshed monthly)
+
+runs:
+  using: composite
+  steps:
+    - id: key
+      shell: bash
+      run: echo "month=$(date +%Y-%m)" >> "$GITHUB_OUTPUT"
+
+    - uses: actions/cache@v6
+      with:
+        path: ~/.local/share/gem
+        key: bashly-${{ runner.os }}-${{ steps.key.outputs.month }}
+
+    - shell: bash
+      run: |
+        gem install bashly --user-install --no-document
+        echo "$(ruby -e 'puts Gem.user_dir')/bin" >> "$GITHUB_PATH"

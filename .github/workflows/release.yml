@@ -23,7 +23,7 @@ jobs:
     steps:
       - uses: actions/checkout@v7
 
-      - run: sudo gem install bashly --no-document
+      - uses: ./.github/actions/setup-bashly
 
       - name: Build
         run: |
