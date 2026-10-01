@@ -8,9 +8,5 @@ yubikey-piv-refresh-backup/
 clack-bash-master/
 clack-bash-master.zip
 
-# superseded by ybman.sh
-/backup.sh
-/provision.sh
-/refresh.sh
 
 .DS_Store
