@@ -1,0 +1,43 @@
+name: release
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: release
+  cancel-in-progress: false
+
+jobs:
+  check:
+    uses: ./.github/workflows/ci.yml
+
+  release:
+    needs: check
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - run: sudo gem install bashly -v 2.0.0 --no-document
+
+      - name: Build
+        run: |
+          bashly generate
+          chmod +x ybman.sh
+          sha256sum ybman.sh > ybman.sh.sha256
+
+      - name: Publish release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          version="$(sed -n 's/^version: *//p' src/bashly.yml | head -n1)"
+          tag="v${version}-build.${GITHUB_RUN_NUMBER}"
+          gh release create "$tag" ybman.sh ybman.sh.sha256 \
+            --target "$GITHUB_SHA" \
+            --title "ybman ${version} (build ${GITHUB_RUN_NUMBER})" \
+            --generate-notes

@@ -10,3 +10,7 @@ clack-bash-master.zip
 
 
 .DS_Store
+
+# build output (just build / bashly generate); published via releases
+/ybman.sh
+/ybman.sh.sha256
