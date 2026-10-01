@@ -20,19 +20,22 @@ jobs:
 
       - uses: ./.github/actions/setup-bashly
 
-      - name: Cache shellharden
-        uses: actions/cache@v6
-        with:
-          path: ~/.cargo/bin/shellharden
-          key: shellharden-${{ runner.os }}-v1
-
       - name: Install tools
         run: |
           sudo apt-get update
           sudo apt-get install -y shellcheck shfmt bats fd-find ugrep
           sudo ln -sf "$(command -v fdfind)" /usr/local/bin/fd
-          [ -x ~/.cargo/bin/shellharden ] || cargo install shellharden --locked
-          echo "$HOME/.cargo/bin" >> "$GITHUB_PATH"
+
+      - name: Install shellharden (prebuilt, checksum-pinned)
+        env:
+          VERSION: v4.3.2
+          SHA512: d65b50a20b0ef937b0aff5b14c14c9fe09036e9bbe28f037f622e944c76346f20759e5b0c45b9e9ab68b03a4125fe0924b87f4ca1f2331e508306e488cd5a998
+        run: |
+          f=shellharden-x86_64-unknown-linux-gnu.tar.gz
+          curl -fsSL -o "$f" "https://github.com/anordal/shellharden/releases/download/$VERSION/$f"
+          echo "$SHA512  $f" | sha512sum -c -
+          tar -xzf "$f" shellharden
+          sudo install -m 0755 shellharden /usr/local/bin/shellharden
 
       - name: shfmt, shellharden, shellcheck
         run: just lint
