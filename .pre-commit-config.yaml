@@ -1,0 +1,29 @@
+repos:
+  - repo: local
+    hooks:
+      - id: shfmt
+        name: shfmt
+        entry: shfmt -d
+        language: system
+        files: ^src/.*\.sh$
+        exclude: ^src/lib/clack\.sh$
+      - id: shellharden
+        name: shellharden
+        entry: shellharden --check
+        language: system
+        files: ^src/.*\.sh$
+        exclude: ^src/lib/clack\.sh$
+      - id: shellcheck
+        name: shellcheck (generated ybman.sh)
+        entry: shellcheck -S warning -e SC2034,SC2206
+        language: system
+        files: ^(ybman\.sh|src/.*\.sh)$
+        exclude: ^src/lib/clack\.sh$
+        pass_filenames: false
+        args: [ybman.sh]
+      - id: bashly-build
+        name: ybman.sh is up to date
+        entry: bash -c 'bashly generate >/dev/null && git diff --exit-code -- ybman.sh'
+        language: system
+        files: ^(src/.*|ybman\.sh)$
+        pass_filenames: false

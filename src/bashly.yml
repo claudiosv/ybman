@@ -1,0 +1,70 @@
+name: ybman.sh
+help: Manage YubiKey PIV slots (9a 9c 9d 9e) - backup, provision, refresh
+version: 0.1.0
+
+environment_variables:
+- name: ybman_backup_root
+  help: Default for --backup-root
+  default: ./yubikey-piv-backups
+
+commands:
+- name: backup
+  alias: b
+  help: Snapshot PIV state (device info, certs, public keys) of connected YubiKeys
+  dependencies: [ykman]
+  flags:
+  - &backup_root
+    long: --backup-root
+    arg: dir
+    help: Directory for backups
+  - &serial
+    long: --serial
+    short: -s
+    arg: serial
+    help: Operate on this YubiKey only (skips the device picker)
+  examples:
+  - ybman.sh backup
+  - ybman.sh backup --serial 37614918
+
+- name: provision
+  alias: p
+  help: Generate keys and self-signed certificates for empty PIV slots
+  dependencies: [ykman, openssl, cmp]
+  flags:
+  - *backup_root
+  - *serial
+  - long: --algorithm
+    short: -a
+    arg: algorithm
+    allowed: [ECCP256, ECCP384]
+    default: ECCP384
+    help: Algorithm for newly generated keys
+  - long: --valid-days
+    short: -d
+    arg: days
+    default: "3650"
+    help: Certificate validity in days
+  - &yes
+    long: --yes
+    short: -y
+    help: Skip the confirmation prompt
+  examples:
+  - ybman.sh provision
+  - ybman.sh provision -s 37614918 -a ECCP256 -d 1825
+
+- name: refresh
+  alias: r
+  help: Renew self-signed PIV certificates, keeping the existing keys
+  dependencies: [ykman, openssl, ugrep]
+  flags:
+  - *backup_root
+  - *serial
+  - long: --valid-days
+    short: -d
+    arg: days
+    default: "3650"
+    help: New certificate validity in days
+  - *yes
+  examples:
+  - ybman.sh refresh
+  - ybman.sh refresh --serial 37614918 --valid-days 3650 --yes

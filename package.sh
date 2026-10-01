@@ -1,0 +1,1 @@
+BINS=ybman.sh

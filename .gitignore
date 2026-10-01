@@ -1,0 +1,16 @@
+# device backups (certs, key info, CHUID) - never commit
+yubikey-piv-backups/
+yubikey-piv-refresh-backup/
+*.pem
+*.bin
+
+# vendored upstream checkout/archive; src/lib/clack.sh is the pinned copy
+clack-bash-master/
+clack-bash-master.zip
+
+# superseded by ybman.sh
+/backup.sh
+/provision.sh
+/refresh.sh
+
+.DS_Store
