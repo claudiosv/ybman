@@ -1,0 +1,57 @@
+.editorconfig
+  s_c9163780a2e3e3::t_5978672956c708 1-8
+.gitignore
+  s_c9163780a2e3e3::t_3fba488b74dd5a 1-16
+.pre-commit-config.yaml
+  s_c9163780a2e3e3::t_a032014f99620d 1-29
+justfile
+  s_c9163780a2e3e3::t_49c41e6a87cafd 1-26
+package.sh
+  s_c9163780a2e3e3::t_f825ae10f33b2f 1
+src/backup_command.sh
+  s_c9163780a2e3e3::t_b44fd18321d051 1-15
+src/bashly.yml
+  s_c9163780a2e3e3::t_2240bb8ee6f777 1-70
+src/initialize.sh
+  s_c9163780a2e3e3::t_1f3a9f3b720a4c 1-5
+src/lib/UPSTREAM.md
+  s_c9163780a2e3e3::t_a759143c81b0f7 1-8
+src/lib/backup_core.sh
+  s_c9163780a2e3e3::t_2298e9c727d36c 1-26
+src/lib/chuid.sh
+  s_c9163780a2e3e3::t_5c465b3b7f62b3 1-42
+src/lib/clack.sh
+  s_c9163780a2e3e3::t_5c02ce9b941d54 1-3358
+src/lib/common.sh
+  s_c9163780a2e3e3::t_074dd702ac8b72 1-128
+src/lib/crypto.sh
+  s_c9163780a2e3e3::t_e689ab40d836f1 1-49
+src/lib/slot_ops.sh
+  s_c9163780a2e3e3::t_2c6fac4f35e449 1-108
+src/lib/yk.sh
+  s_c9163780a2e3e3::t_0fbf99dc6ca07e 1-77
+src/provision_command.sh
+  s_c9163780a2e3e3::t_f1963a990430cf 1-96
+src/refresh_command.sh
+  s_c9163780a2e3e3::t_03550d8c91e731 1-70
+tests/ybman.bats
+  s_c9163780a2e3e3::t_69686a2848bc11 1-60
+ybman.sh
+  s_c9163780a2e3e3::t_ee25d345794b4a 1-4841
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "6c9f96703378e1f60401d7b450c5ba9ff66056c2",
+  "prompts": {},
+  "sessions": {
+    "s_c9163780a2e3e3": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "61e35078-273c-4ee7-a0ce-f930551c2800",
+        "model": "claude-sonnet-5-5"
+      },
+      "human_author": "Claudio Spiess <claudiosv@users.noreply.github.com>"
+    }
+  }
+}
