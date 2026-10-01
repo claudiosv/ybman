@@ -8,6 +8,10 @@ build:
 fmt:
     shfmt -w {{srcs}}
 
+# Apply shellcheck's auto-fixes (only fixable findings produce a diff).
+fix:
+    shellcheck -s bash -f diff {{srcs}} | git apply --allow-empty
+
 harden:
     shellharden --replace {{srcs}}
 
