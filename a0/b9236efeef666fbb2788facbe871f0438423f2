@@ -1,0 +1,16 @@
+.github/workflows/ci.yml
+  h_f111268fb1cdbc 14,16,18,29
+.github/workflows/release.yml
+  h_f111268fb1cdbc 24,26
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "a0b9236efeef666fbb2788facbe871f0438423f2",
+  "prompts": {},
+  "humans": {
+    "h_f111268fb1cdbc": {
+      "author": "claudiosv <8250468+claudiosv@users.noreply.github.com>"
+    }
+  }
+}
