@@ -1,0 +1,25 @@
+.gitignore
+  s_c9163780a2e3e3::t_bbf16d9d0212bd 13-16
+.github/workflows/ci.yml
+  s_c9163780a2e3e3::t_bbf16d9d0212bd 1-37
+.pre-commit-config.yaml
+  s_c9163780a2e3e3::t_bbf16d9d0212bd 17-18,20
+.github/workflows/release.yml
+  s_c9163780a2e3e3::t_bbf16d9d0212bd 1-43
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "fb8e93c985d1d73b69adf7c4ee0c324b314c4b4d",
+  "prompts": {},
+  "sessions": {
+    "s_c9163780a2e3e3": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "61e35078-273c-4ee7-a0ce-f930551c2800",
+        "model": "claude-sonnet-5-5"
+      },
+      "human_author": "claudiosv <8250468+claudiosv@users.noreply.github.com>"
+    }
+  }
+}
