@@ -14,3 +14,4 @@ clack-bash-master.zip
 # build output (just build / bashly generate); published via releases
 /ybman.sh
 /ybman.sh.sha256
+/bin/
