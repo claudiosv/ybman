@@ -1,0 +1,23 @@
+.github/actions/setup-bashly/action.yml
+  s_c9163780a2e3e3::t_5d29de11527520 1-19
+.github/workflows/ci.yml
+  s_c9163780a2e3e3::t_6d0dd10a852db0 4-6,21-24,27,34
+.github/workflows/release.yml
+  s_c9163780a2e3e3::t_4f39febd39ea39 26
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.4",
+  "base_commit_sha": "e77f49599751f9e7885172a0335fec39614f4823",
+  "prompts": {},
+  "sessions": {
+    "s_c9163780a2e3e3": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "61e35078-273c-4ee7-a0ce-f930551c2800",
+        "model": "claude-sonnet-5-5"
+      },
+      "human_author": "claudiosv <8250468+claudiosv@users.noreply.github.com>"
+    }
+  }
+}
